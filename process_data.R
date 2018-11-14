@@ -22,4 +22,6 @@ poll_data <- map_dfr(file_list, read_csv, .id = "source")
 
 wave_3_data <- poll_data %>%
   filter(str_sub(source, -5, -5) == 3) %>%
-  mutate(district_info =  str_sub(source, -10, -7))
+  mutate(district_info =  str_sub(source, -10, -7)) %>%
+  mutate(state = toupper(str_sub(district_info, 1, 2))) %>%
+  mutate(district = str_sub(district_info, 3, 4))
