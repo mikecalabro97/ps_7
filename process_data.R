@@ -19,3 +19,7 @@ file_list <- dir_ls("2018-live-poll-results-master/data/")
 
 #read in all the data and put it into 1 table, with the source indicated
 poll_data <- map_dfr(file_list, read_csv, .id = "source")
+
+wave_3_data <- poll_data %>%
+  filter(str_sub(source, -5, -5) == 3) %>%
+  mutate(district_info =  str_sub(source, -10, -7))
