@@ -56,12 +56,15 @@ wave_3 <- wave_3_data %>%
   #spread data with response as columns, weighted total as data
   spread(response, weighted_total)
 
+#makes a table with the total weighted responses
 vote_totals <- wave_3_data %>%
   group_by(state_district) %>%
   summarize(total_weighted = n()*mean(final_weight))
 
+#combines the totals to the wave 3 response data for percentage purposes
 wave_3 <- left_join(wave_3, vote_totals, by = "state_district")
 
+#changes NAs to 0s for addition purposes
 wave_3[is.na(wave_3)] <- 0
 
 wave_3 <- wave_3 %>%
