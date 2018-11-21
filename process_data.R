@@ -65,7 +65,20 @@ wave_3 <- wave_3 %>%
 poll_and_results <- left_join(wave_3, results, by = "state_district") %>%
   select(state_district, poll_rep_adv, real_rep_adv) %>%
   mutate(polling_error = real_rep_adv - poll_rep_adv) %>%
-  filter(! is.na(real_rep_adv))
+  filter(! is.na(real_rep_adv)) %>%
+  arrange(polling_error)
+
+wave_3_gender <- wave_3_data %>%
+  group_by(state_district, gender) %>%
+  summarize(responses = n(), avg_weight = mean(final_weight)) %>%
+  mutate(weighted_total = avg_weight * responses) %>%
+  select(state_district, gender, weighted_total) %>%
+  spread(gender, weighted_total) %>%
+  mutate(percent_female = Female/(Male + Female)) %>%
+  select(state_district, percent_female) %>%
+  arrange(percent_female)
+
+wave_3 <- left_join(wave_3, wave_3_gender, by = "state_district")
   
 
 
