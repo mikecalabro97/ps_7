@@ -67,28 +67,45 @@ wave_3 <- left_join(wave_3, vote_totals, by = "state_district")
 #changes NAs to 0s for addition purposes
 wave_3[is.na(wave_3)] <- 0
 
+#calculates the republican advantage and only keeps that and the state/district
 wave_3 <- wave_3 %>%
   mutate(poll_rep_adv = (Rep - Dem)/total_weighted) %>%
   select(state_district, poll_rep_adv) 
 
+#combines the rep adv for polls and for actual results
 poll_and_results <- left_join(wave_3, results, by = "state_district") %>%
+  #only keeps the columns that we need
   select(state_district, poll_rep_adv, real_rep_adv) %>%
+  #add the polling error
   mutate(polling_error = real_rep_adv - poll_rep_adv) %>%
+  #removes the gov and senate races that snuck into my data
   filter(! is.na(real_rep_adv)) %>%
+  #arranges based on polling error
   arrange(polling_error)
 
+#will eventually add a new column to poll_and_results for % of female voters 
 wave_3_gender <- wave_3_data %>%
+  #groups every state/district / gender combo
   group_by(state_district, gender) %>%
+  #summarizes number of responses and avg weight per group
   summarize(responses = n(), avg_weight = mean(final_weight)) %>%
+  #weights the responses accordingly
   mutate(weighted_total = avg_weight * responses) %>%
+  #selects only needed variables
   select(state_district, gender, weighted_total) %>%
+  #spreads data with gender as columns, weighted_total as data
   spread(gender, weighted_total) %>%
+  #calculates percentage of female respondants
   mutate(percent_female = Female/(Male + Female)) %>%
+  #select only state/district and female percent
   select(state_district, percent_female) %>%
+  #arranges by female percent
   arrange(percent_female)
 
+#add this female percent column to poll_and_results
 poll_and_results2 <- left_join(poll_and_results, wave_3_gender, by = "state_district")
   
+#this code does the same as the code above, but for party id
 wave_3_partyid <- wave_3_data %>%
   group_by(state_district, partyid) %>%
   summarize(responses = n(), avg_weight = mean(final_weight)) %>%
@@ -98,6 +115,8 @@ wave_3_partyid <- wave_3_data %>%
   mutate(percent_independant = `Independent (No party)` / (`Independent (No party)` + Democrat + Republican)) %>%
   select(state_district, percent_independant)
 
+#add the new party id column to poll_and results
 poll_and_results_final <- left_join(poll_and_results2, wave_3_partyid, by = "state_district")
 
+#helps move data to my app
 write_rds(poll_and_results_final, path = "pset7_app/ps7_app_data")

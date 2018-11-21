@@ -13,6 +13,7 @@ ui <- fluidPage(
    # Sidebar with a slider input for number of bins 
    sidebarLayout(
       sidebarPanel(
+        #makes radio buttons to determine what the x axis is for the graph
          radioButtons("radio",
                       "Select x-axis:",
                       choices = c("Percent Female", "Percent Independent"),
@@ -26,10 +27,11 @@ ui <- fluidPage(
    )
 )
 
-# Define server logic required to draw a histogram
+# Define server logic required to draw a scatterplot
 server <- function(input, output) {
    
    output$scatterplot <- renderPlot({
+     #if the radio button is switched to percent independent, create one plot
      if(input$radio == "Percent Independent"){
        
      final_shiny_data %>%
@@ -41,7 +43,7 @@ respondants who identify asindependent and polling error") +
          labs(x = "Percentage of Independent Voters", y = "Polling Error")
        
      }
-     
+     #if the radio button is switched to percent female, create this other plot
      else if(input$radio == "Percent Female") {
        
        final_shiny_data %>%
