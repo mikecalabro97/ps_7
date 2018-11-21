@@ -40,7 +40,7 @@ server <- function(input, output) {
          #adds a line of best fit with a title and labels
          geom_smooth(method = lm) +
          ggtitle("There was little to no correlation between percentage of 
-respondants who identify asindependent and polling error") +
+respondants who identify as independent and polling error") +
          labs(x = "Percentage of Independent Voters", y = "Polling Error")
        
      }
@@ -54,7 +54,7 @@ respondants who identify asindependent and polling error") +
          #adds a line of best fit
          geom_smooth(method = lm) +
          ggtitle("There was little to no correlation between percentage
-of female respondants andpolling error") +
+of female respondants and polling error") +
          labs(x = "Percentage of Female Voters", y = "Polling Error")
        
      }
