@@ -97,4 +97,4 @@ wave_3_partyid <- wave_3_data %>%
 
 poll_and_results_final <- left_join(poll_and_results2, wave_3_partyid, by = "state_district")
 
-
+write_rds(poll_and_results_final, path = "pset7_app/ps7_app_data")
