@@ -17,7 +17,7 @@ ui <- fluidPage(
          radioButtons("radio",
                       "Select x-axis:",
                       choices = c("Percent Female", "Percent Independent"),
-                      selected = "Percent Independent")
+                      selected = "Percent Female")
       ),
       
       # Show a plot of the generated distribution
@@ -35,8 +35,10 @@ server <- function(input, output) {
      if(input$radio == "Percent Independent"){
        
      final_shiny_data %>%
+         #creates a scatterplot
        ggplot(aes(x = percent_independant, y = polling_error)) +
          geom_point() +
+         #adds a line of best fit with a title and labels
          geom_smooth(method = lm) +
          ggtitle("There was little to no correlation between percentage of 
 respondants who identify asindependent and polling error") +
@@ -47,8 +49,10 @@ respondants who identify asindependent and polling error") +
      else if(input$radio == "Percent Female") {
        
        final_shiny_data %>%
+         #creates a scatterplot
          ggplot(aes(x = percent_female, y = polling_error)) +
          geom_point() +
+         #adds a line of best fit
          geom_smooth(method = lm) +
          ggtitle("There was little to no correlation between percentage
 of female respondants andpolling error") +
