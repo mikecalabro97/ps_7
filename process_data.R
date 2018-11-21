@@ -43,11 +43,17 @@ wave_3_data <- poll_data %>%
   #nicely formatted state and district
   mutate(state_district = paste(state, district, sep = "-"))
 
+#make a new table for wave 3
 wave_3 <- wave_3_data %>%
+  #groups by response
   group_by(state_district, response) %>%
+  #summarizes the number of responses and final weight average for each group
   summarize(responses = n(), avg_weight = mean(final_weight)) %>%
+  #weights the responses accordingly
   mutate(weighted_total = avg_weight * responses) %>%
+  #select only needed varaibles
   select(state_district, response, weighted_total) %>%
+  #spread data with response as columns, weighted total as data
   spread(response, weighted_total)
 
 vote_totals <- wave_3_data %>%
@@ -78,7 +84,17 @@ wave_3_gender <- wave_3_data %>%
   select(state_district, percent_female) %>%
   arrange(percent_female)
 
-wave_3 <- left_join(wave_3, wave_3_gender, by = "state_district")
+poll_and_results2 <- left_join(poll_and_results, wave_3_gender, by = "state_district")
   
+wave_3_partyid <- wave_3_data %>%
+  group_by(state_district, partyid) %>%
+  summarize(responses = n(), avg_weight = mean(final_weight)) %>%
+  mutate(weighted_total = avg_weight * responses) %>%
+  select(state_district, partyid, weighted_total) %>%
+  spread(partyid, weighted_total) %>%
+  mutate(percent_independant = `Independent (No party)` / (`Independent (No party)` + Democrat + Republican)) %>%
+  select(state_district, percent_independant)
+
+poll_and_results_final <- left_join(poll_and_results2, wave_3_partyid, by = "state_district")
 
 
