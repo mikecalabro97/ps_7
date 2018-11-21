@@ -9,7 +9,9 @@ results <- read_csv("mt_2_results (1).csv") %>%
   filter(! district == "gov") %>%
   filter(! district == "sen") %>%
   #create a column which states the state and district for each house race
-  mutate(state_district = paste(state, district, sep = "-"))
+  mutate(state_district = paste(state, district, sep = "-")) %>%
+  mutate(real_rep_adv = (rep_votes - dem_votes)/(rep_votes + dem_votes + other_votes)) %>%
+  filter(state_district %in% wave_3$state_district) 
 
 #download the file from the link into a zip in my project
 download.file(url = "https://goo.gl/ZRCBda",
@@ -41,5 +43,29 @@ wave_3_data <- poll_data %>%
   #nicely formatted state and district
   mutate(state_district = paste(state, district, sep = "-"))
 
+wave_3 <- wave_3_data %>%
+  group_by(state_district, response) %>%
+  summarize(responses = n(), avg_weight = mean(final_weight)) %>%
+  mutate(weighted_total = avg_weight * responses) %>%
+  select(state_district, response, weighted_total) %>%
+  spread(response, weighted_total)
+
+vote_totals <- wave_3_data %>%
+  group_by(state_district) %>%
+  summarize(total_weighted = n()*mean(final_weight))
+
+wave_3 <- left_join(wave_3, vote_totals, by = "state_district")
+
+wave_3[is.na(wave_3)] <- 0
+
+wave_3 <- wave_3 %>%
+  mutate(poll_rep_adv = (Rep - Dem)/total_weighted) %>%
+  select(state_district, poll_rep_adv) 
+
+poll_and_results <- left_join(wave_3, results, by = "state_district") %>%
+  select(state_district, poll_rep_adv, real_rep_adv) %>%
+  mutate(polling_error = real_rep_adv - poll_rep_adv) %>%
+  filter(! is.na(real_rep_adv))
+  
 
 
